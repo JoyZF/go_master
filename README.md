@@ -17,4 +17,5 @@
 - [x] Local Cache
 - [ ] json
 - [ ] Redis
+- [ ] SingleFlight
 - [ ] ...
