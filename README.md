@@ -18,4 +18,5 @@
 - [ ] json
 - [ ] Redis
 - [ ] SingleFlight
+- [x] JWT
 - [ ] ...
