@@ -20,4 +20,18 @@ Pod是k8s的最小单元。同一个controller中会有一个pause，同一个co
 ![](_doc/10.png)
 ## Pod重启策略
 ![](_doc/11.png)
+## Pod健康检查
+![](_doc/12.png)
+## Pod 创建流程
+![](_doc/13.png)
+## Pod调度影响
+![](_doc/14.png)
+
+# Controller
+![](_doc/15.png)
+![](_doc/16.png)
+![](_doc/17.png)
+![](_doc/18.png)
+# Services
+
 https://www.bilibili.com/video/BV1GT4y1A756?p=24
