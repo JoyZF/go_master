@@ -33,5 +33,6 @@ Pod是k8s的最小单元。同一个controller中会有一个pause，同一个co
 ![](_doc/17.png)
 ![](_doc/18.png)
 # Services
+![](_doc/19.png)
 
 https://www.bilibili.com/video/BV1GT4y1A756?p=24
