@@ -24,3 +24,4 @@ errors.New()返回的是内部errorString对象的指针
 
 # ref
 [【Go进阶—基础特性】错误](https://segmentfault.com/a/1190000041658072)
+
