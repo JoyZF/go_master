@@ -1,7 +1,7 @@
 package main
 
-func main()  {
-	go func() {
-		// todo
-	}()
-}
+//func main()  {
+//	go func() {
+//		// todo
+//	}()
+//}
