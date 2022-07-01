@@ -30,4 +30,5 @@
 - [x] slow ddos
 - [x] trie
 - [x] graceful
+- [x] mermaid
 - [ ] ...

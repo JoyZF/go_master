@@ -2,13 +2,12 @@ package main
 
 import "fmt"
 
-//func main() {
-//	inner.SetParams1("hello")
-//	fmt.Println(inner.GetParams1())
-//}
-var mapID = 1
-var version = 2
 func main() {
-	a := 0 | 1
+	var a = 1
+	test(a)
 	fmt.Println(a)
+}
+
+func test(a int) {
+	a = 5
 }
