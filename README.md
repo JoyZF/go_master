@@ -31,4 +31,5 @@
 - [x] trie
 - [x] graceful
 - [x] mermaid
+- [x] rand string
 - [ ] ...
