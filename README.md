@@ -33,4 +33,7 @@
 - [x] mermaid
 - [x] rand string
 - [x] BFE
-- [ ] ...
+- [x] decoration
+- [ ] MQ
+
+冒个泡。。。
