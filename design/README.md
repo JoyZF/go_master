@@ -1,0 +1,1 @@
+[最全GO语言实现设计模式](https://segmentfault.com/a/1190000042859564)
