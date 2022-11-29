@@ -37,3 +37,6 @@
 - [ ] MQ
 
 冒个泡。。。
+
+###### 一种switch case的用法。
+![](./doc/img.png)
