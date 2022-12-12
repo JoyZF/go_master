@@ -1,0 +1,2 @@
+{"level":"info","ts":1670401003.893486,"caller":"logs/main.go:28","msg":"message is {Name:张三 Age:10}"}
+{"level":"info","ts":1670401003.893615,"caller":"logs/main.go:29","msg":"map is map[age:10 name:张三]"}

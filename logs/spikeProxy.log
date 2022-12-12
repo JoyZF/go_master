@@ -1,0 +1,7 @@
+2022-12-07T16:20:05.955+0800	info	/Users/joy/workspace/gopath/src/go_master/logs/main.go:49	log 初始化成功	{"serviceName": "spikeProxy"}
+2022-12-07T16:20:05.955+0800	info	/Users/joy/workspace/gopath/src/go_master/logs/main.go:51	无法获取网址	{"serviceName": "spikeProxy", "url": "http://www.baidu.com", "attempt": 3, "backoff": 1}
+{"level":"info","time":"2022-12-07T16:20:24.207+0800","caller":"/Users/joy/workspace/gopath/src/go_master/logs/main.go:49","msg":"log 初始化成功","serviceName":"spikeProxy"}
+{"level":"info","time":"2022-12-07T16:20:24.207+0800","caller":"/Users/joy/workspace/gopath/src/go_master/logs/main.go:51","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}
+{"level":"info","time":"2022-12-07T16:20:44.225+0800","caller":"/Users/joy/workspace/gopath/src/go_master/logs/main.go:49","msg":"log 初始化成功","serviceName":"spikeProxy"}
+{"level":"info","time":"2022-12-07T16:20:44.225+0800","caller":"/Users/joy/workspace/gopath/src/go_master/logs/main.go:51","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}
+{"level":"info","time":"2022-12-07T16:32:55.725+0800","caller":"/Users/joy/workspace/gopath/src/go_master/logs/main.go:54","msg":"message is map[name:map[age:10]]","serviceName":"spikeProxy"}

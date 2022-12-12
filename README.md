@@ -35,6 +35,7 @@
 - [x] BFE
 - [x] decoration
 - [ ] MQ
+- [x] Redis distributed locks
 
 冒个泡。。。
 
