@@ -11,9 +11,11 @@ type A struct {
 }
 
 func main() {
-	go watch()
-	for  {
-		
+	m := make(map[int]string)
+	if _,ok := m[0]; ok {
+		fmt.Println(1)
+	} else {
+		fmt.Println(2)
 	}
 }
 
