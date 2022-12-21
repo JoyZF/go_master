@@ -47,3 +47,9 @@
 
 ###### 数组的用法
 ![](./doc/img_2.png)
+
+###### golang 查看汇编
+[Go命令行—compile](http://t.zoukankan.com/linguoguo-p-11699006.html)
+```go
+go tool compile -S main.go
+```
