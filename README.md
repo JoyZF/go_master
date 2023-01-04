@@ -53,3 +53,20 @@
 ```go
 go tool compile -S main.go
 ```
+
+###### 加入nocopy 
+```go
+// noCopy may be embedded into structs which must not be copied
+// after the first use.
+//
+// See https://golang.org/issues/8005#issuecomment-190753527
+// for details.
+type noCopy struct{}
+
+// Lock is a no-op used by -copylocks checker from `go vet`.
+func (*noCopy) Lock()   {}
+func (*noCopy) Unlock() {}
+```
+
+###### channel 定位于通信，用于一发一收的场景，sync.Cond 定位于同步，用于一发多收的场景。
+[Golang sync.Cond 简介与用法](https://blog.csdn.net/K346K346/article/details/95673050)
