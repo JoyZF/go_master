@@ -1,8 +1,7 @@
 # go_master
-深入学习go+N+M
 
 ## 目录
-- [ ] error 
+- [x] error 
 - [ ] concurrency
 - [x] runtime
 - [ ] testing
