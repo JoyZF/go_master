@@ -37,6 +37,7 @@
 - [x] Redis distributed locks
 - [x] AST
 - [ ] template
+- [x] Functional options
 
 冒个泡。。。
 
