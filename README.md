@@ -39,7 +39,7 @@
 - [ ] template
 - [x] Functional options
 
-冒个泡。。。
+##### 平时的一些收集
 
 ###### 一种switch case的用法。
 ![](./doc/img.png)
