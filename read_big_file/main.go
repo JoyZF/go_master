@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func main()  {
+func main() {
 	ReadFile("/Users/joy/workspace/gopath/src/go_master/read_big_file/1.txt", func(bytes []byte) {
 		fmt.Println(string(bytes))
 	})
@@ -22,11 +22,11 @@ func ReadFile(filePath string, handle func([]byte)) error {
 	}
 
 	buf := bufio.NewReader(f)
-	for  {
+	for {
 		line, _, err := buf.ReadLine()
 		handle(line)
 		if err != nil {
-			if err == io.EOF{
+			if err == io.EOF {
 				return nil
 			}
 			return err
@@ -40,9 +40,5 @@ func ReadBigFile(fileName string, handle func([]byte)) error {
 	if err != nil {
 		panic(err)
 	}
-	
-
-
+	return nil
 }
-
-

@@ -60,3 +60,5 @@ func main() {
 
 
 ```
+
+// todo 补充uber的GC优化机制  Go1.19 优化的内存模型。

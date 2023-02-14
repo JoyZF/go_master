@@ -2,7 +2,7 @@
 基础库中大量自定义的error
 ```go
 var {
-	ErrorSomething = errors.New("somethind")
+	ErrorSomething = errors.New("something")
 }
 ```
 errors.New()返回的是内部errorString对象的指针
