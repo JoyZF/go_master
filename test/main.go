@@ -7,22 +7,10 @@ import (
 	"time"
 )
 
-type Aa struct {
-}
-
-func (i Aa) A() {
-
-}
-
-func (i Aa) B() {
-
-}
-
-func testFunc() {
-}
-
 func main() {
-	fmt.Println(generateAtoZ())
+	for i := 0; i < 1000; i++ {
+		fmt.Println(generateAtoZ())
+	}
 }
 
 func generateAtoZ() string {
