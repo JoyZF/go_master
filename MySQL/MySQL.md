@@ -269,15 +269,17 @@ MySQL 提供了一个change buffer ，将更新操作先记录在里边，减少
 其中1和2会影响用户体验。需要设置对应的配置优化脏页刷新频率。
 
 ### 删数据表的操作
-
+删除数据只是标记为可复用，但磁盘上文件不会变小。
 删除数据之后需要重建表 命令为alter table 表名 engine=InnoDB
 
 ### SELECT count(*)的操作
 
-- MyISAM 将一个表的总行数存在磁盘上，因此MyISAM的count(*)的效率很高
+- MyISAM 将一个表的总行数存在磁盘上，因此MyISAM的count(*)的效率很高，但也仅限于不带where的语句。
 - InnoDB需要一行行地从引擎中读出来，累加。
 
-InnoDB不采用维护一个总行数的原因是因为事务设计的关系。
+InnoDB不采用维护一个总行数的原因是因为事务设计（MVCC）的关系。当多个事务存在insert的时候 不符合可重复读的隔离级别。
+
+按照效率排序的话，count(字段)<count(主键id)<count(1)≈count(*)，所以我建议你，尽量使用count(*)。
 
 ### order by rand()的问题
 
