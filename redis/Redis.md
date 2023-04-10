@@ -1,4 +1,25 @@
 # 基础
+![](https://static001.geekbang.org/resource/image/79/e7/79da7093ed998a99d9abe91e610b74e7.jpg?wh=2001*1126)
+![](https://static001.geekbang.org/resource/image/70/b4/70a5bc1ddc9e3579a2fcb8a5d44118b4.jpeg?wh=2048*1536)
+
+### ACID
+- 原子性
+- 一致性
+- 隔离性
+- 持久性
+
+![](https://static001.geekbang.org/resource/image/95/50/9571308df0620214d7ccb2f2cc73a250.jpg?wh=2505*734)
+Redis 事务机制可以保证一致性和隔离性，但是无法保证持久性（持久性由RDB和AOF配置决定）.
+原子性的情况比较复杂。只有当事务中使用的命令语法有误时，原子性得不到保证，在其他情况下事务都可以原子性执行。
+
+
+### redis事务
+Redis提供了MULTI、EXEC来完成事务。
+- 客户端使用一个命令显式表示一个事务的开启。MULTI
+- 客户端把事务中本身要执行的具体操作发送给服务端。但是Redis只是把这些命令暂存到一个命令队列中，并不会立即执行
+- 客户端向服务端发送提交事务的命令。EXEC。
+- 
+
 
 ## 基础架构
 
@@ -6,11 +27,11 @@
 
 Redis键值对的数据类型有
 
-- String
-- List
-- Hash
-- Set
-- Sorted Set
+- String 简单动态字符串
+- List 双向链表+压缩列表
+- Hash 压缩列表+哈希表
+- Set  哈希表+整数数组
+- Sorted Set 压缩列表+跳表
 
 然而Redis底层数据结构有：
 
@@ -61,6 +82,7 @@ Redis数据类型和底层数据结构的对应关系
 
 Redis 仍然正常处理客户端请求，每处理一个请求时，从哈希表 1 中的第一个索引位置开始，顺带着将这个索引位置上的所有 entries 拷贝到哈希表 2 中；等处理下一个请求时，再顺带拷贝哈希表 1 中的下一个索引位置的 entries。
 
+*和golang的map扩容类似* 
 ![](https://static001.geekbang.org/resource/image/73/0c/73fb212d0b0928d96a0d7d6ayy76da0c.jpg)
 
 
@@ -240,10 +262,8 @@ replicaof 172.16.19.3 6379
 
 从 Redis 2.8 开始，网络断了之后，主从库会采用增量复制的方式继续同步。听名字大概就可以猜到它和全量复制的不同：全量复制是同步所有数据，而增量复制只会把主从库网络断连期间主库收到的命令，同步给从库。
 
-
-
 那么，增量复制时，主从库之间具体是怎么保持同步的呢？这里的奥妙就在于 repl_backlog_buffer 这个缓冲区。我们先来看下它是如何用于增量命令的同步的。当主从库断连后，主库会把断连期间收到的写操作命令，写入 replication buffer，同时也会把这些操作命令也写入 repl_backlog_buffer 这个缓冲区。
-
+![](https://static001.geekbang.org/resource/image/13/37/13f26570a1b90549e6171ea24554b737.jpg?wh=4000*1065)
 repl_backlog_buffer 是一个环形缓冲区，主库会记录自己写到的位置，从库则会记录自己已经读到的位置。
 
 刚开始的时候，主库和从库的写读位置在一起，这算是它们的起始位置。随着主库不断接收新的写操作，它在缓冲区中的写位置会逐步偏离起始位置，我们通常用偏移量来衡量这个偏移距离的大小，对主库来说，对应的偏移量就是 master_repl_offset。主库接收的新写操作越多，这个值就会越大。同样，从库在复制完写操作命令后，它在缓冲区中的读位置也开始逐步偏移刚才的起始位置，此时，从库已复制的偏移量 slave_repl_offset 也在不断增加。正常情况下，这两个偏移量基本相等。
@@ -511,4 +531,58 @@ Redis使用了IO多路复用机制，避免了主线程一直等待网络连接�
 - 进程绑定CPU不合理
 - Redis实例运行机器上开启了透明内存大页机制
 - 网卡压力过大
+# big key 排查check list
+- 在执行redis-cli 命令时带上--bigkeys 选项，进而对整个数据库中的键值对大小情况进行统计分析。
+  比如说，统计每种数据类型的键值对个数以及平均大小。此外，这个命令执行后，会输出每种数据类型中最大的 bigkey 的信息，对于 String 类型来说，会输出最大 bigkey 的字节长度，对于集合类型来说，会输出最大 bigkey 的元素个数，如下所示：
 
+```shell
+
+./redis-cli  --bigkeys
+
+-------- summary -------
+Sampled 32 keys in the keyspace!
+Total key length in bytes is 184 (avg len 5.75)
+
+//统计每种数据类型中元素个数最多的bigkey
+Biggest   list found 'product1' has 8 items
+Biggest   hash found 'dtemp' has 5 fields
+Biggest string found 'page2' has 28 bytes
+Biggest stream found 'mqstream' has 4 entries
+Biggest    set found 'userid' has 5 members
+Biggest   zset found 'device:temperature' has 6 members
+
+//统计每种数据类型的总键值个数，占所有键值个数的比例，以及平均大小
+4 lists with 15 items (12.50% of keys, avg size 3.75)
+5 hashs with 14 fields (15.62% of keys, avg size 2.80)
+10 strings with 68 bytes (31.25% of keys, avg size 6.80)
+1 streams with 4 entries (03.12% of keys, avg size 4.00)
+7 sets with 19 members (21.88% of keys, avg size 2.71)
+5 zsets with 17 members (15.62% of keys, avg size 3.40)
+```
+
+不过在使用--bigkeys时需要注意这个工具是通过扫描数据库来查找bigkey的 所以会对redis实例的性能产生影响。
+如果你在使用主从集群，我建议你在从节点上执行该命令。因为主节点上执行时，会阻塞主节点。如果没有从节点，那么，我给你两个小建议：第一个建议是，在 Redis 实例业务压力的低峰阶段进行扫描查询，以免影响到实例的正常运行；第二个建议是，可以使用 -i 参数控制扫描间隔，避免长时间扫描降低 Redis 实例的性能。例如，我们执行如下命令时，redis-cli 会每扫描 100 次暂停 100 毫秒（0.1 秒）。
+
+```shell
+
+./redis-cli  --bigkeys -i 0.1
+```
+-- 这个方法只能返回每种类型中最大的那个 bigkey，无法得到大小排在前 N 位的 bigkey；
+
+-- 对于集合类型来说，这个方法只统计集合元素个数的多少，而不是实际占用的内存量。但是，一个集合中的元素个数多，并不一定占用的内存就多。因为，有可能每个元素占用的内存很小，这样的话，即使元素个数有很多，总内存开销也不大。
+
+另外我们可以自己开发一个程序来进行统计。
+- 使用SCAN对数据库扫描
+- 使用TYPE命令获取返回的每个key的类型
+- 对string类型可以使用STRLEN获取字符串长度
+- 对集合类型可以使用如下命令统计
+- - LIST: LLEN 
+- - Hash: HLEN
+- - Set: SCARD
+- - Sort Set: ZCARD
+如果不能体现知道写入集合元素的大小，可以使用MEMORY USAGE 查询键值占用内容空间大小。
+```shell
+
+MEMORY USAGE user:info
+(integer) 315663239
+```
