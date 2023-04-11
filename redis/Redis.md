@@ -482,6 +482,27 @@ Redis使用了IO多路复用机制，避免了主线程一直等待网络连接�
 
 ### CPU对Redis性能的影响
 
+###  redis缓存替换策略
+不进行数据淘汰
+- noeviction不进行数据淘汰
+在设置过期时间的key中进行淘汰
+- volatile-random
+- volatile-ttl
+- volatile-lru
+- volatile-lfu
+在所有key中进行淘汰
+- allkeys-lru
+- allkeys-random
+- allkeys-lfu
+![](https://static001.geekbang.org/resource/image/04/f6/04bdd13b760016ec3b30f4b02e133df6.jpg?wh=1757*765)
+
+###### 使用建议
+- 优先使用 allkeys-lru 策略。这样，可以充分利用 LRU 这一经典缓存算法的优势，把最近最常访问的数据留在缓存中，提升应用的访问性能。如果你的业务数据中有明显的冷热数据区分，我建议你使用 allkeys-lru 策略。
+- 如果业务应用中的数据访问频率相差不大，没有明显的冷热数据区分，建议使用 allkeys-random 策略，随机选择淘汰的数据就行。
+- 如果你的业务中有置顶的需求，比如置顶新闻、置顶视频，那么，可以使用 volatile-lru 策略，同时不给这些置顶数据设置过期时间。这样一来，这些需要置顶的数据一直不会被删除，而其他数据会在过期时根据 LRU 规则进行筛选。
+
+总结：根据业务场景选择不同的过期淘汰策略。
+
 ### 缓存雪崩、击穿、穿透
 
 #### 缓存雪崩
