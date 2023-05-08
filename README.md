@@ -38,6 +38,7 @@
 - [x] AST
 - [ ] template
 - [x] Functional options
+- [x] linux
 
 ##### 平时的一些收集
 
