@@ -73,3 +73,24 @@ func (*noCopy) Unlock() {}
 
 ###### channel 定位于通信，用于一发一收的场景，sync.Cond 定位于同步，用于一发多收的场景。
 [Golang sync.Cond 简介与用法](https://blog.csdn.net/K346K346/article/details/95673050)
+
+##### golang中为什么要用string(a) == string(b)来比较两个[]byte是否相等
+```go
+func Equal(a, b []byte) bool {
+	// Neither cmd/compile nor gccgo allocates for these string conversions.
+	return string(a) == string(b)
+}
+
+// golang中为什么要用string(a) == string(b)来比较两个[]byte是否相等
+// 在Go语言中，使用string(a) == string(b)比较两个[]byte是否相等的原因是，Go语言中的slice类型（包括[]byte）是引用透明的，也就是说，不论是声明还是使用slice，底层都会为其分配一块连续的内存空间。因此，如果两个slice的内容相同，那么它们在内存中的地址也是相同的，这时使用==比较它们是否相等是可以的。否则，如果两个slice的内容不同，那么使用==比较它们会返回false，因为它们在内存中的地址不同。因此，在使用slice类型进行比较时，通常使用string(a) == string(b)来比较两个slice是否相等。
+
+```
+
+##### HasSuffix 的写法
+
+```go
+func HasSuffix(s, suffix []byte) bool {
+	return len(s) >= len(suffix) && Equal(s[len(s)-len(suffix):], suffix)
+}
+// HasSuffix 的写法
+```
