@@ -49,3 +49,16 @@ func atoi(s string) (int, bool) {
 	return 0, false
 }
 ```
+
+直接通过强转 string(bytes) 或者 []byte(str) 会带来数据的复制，性能不佳，所以在追求极致性能场景使用 unsafe 包的方式直接进行转换来提升性能：
+```go
+
+// toBytes performs unholy acts to avoid allocations
+func toBytes(s string) []byte {
+  return *(*[]byte)(unsafe.Pointer(&s))
+}
+// toString performs unholy acts to avoid allocations
+func toString(b []byte) string {
+  return *(*string)(unsafe.Pointer(&b))
+}
+```
