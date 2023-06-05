@@ -15,4 +15,10 @@ func main() {
 	// sum := 100 + 0x10
 	// print 108
 	fmt.Println(sum)
+
+	s := "hêllo"
+	for i := range s {
+		fmt.Printf("position %d: %c\n", i, s[i])
+	}
+	fmt.Printf("len=%d\n", len(s))
 }
