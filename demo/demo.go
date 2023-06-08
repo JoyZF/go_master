@@ -9,6 +9,21 @@ import (
 var version string
 
 func main() {
+	strings := make(chan string, 1<<45)
+	go func() {
+		for {
+			strings <- "hello"
+		}
+	}()
+	go func() {
+		for {
+			str := <-strings
+			fmt.Println(str)
+		}
+	}()
+	for {
+
+	}
 	fmt.Println(version)
 	sum := 100 + 010
 	// 在 Go 中以 0 开头的整数表示八进制数
