@@ -564,9 +564,446 @@ func (e *entry) storeLocked(i *interface{}) {
 ### 进阶版优化
 - hash key https://github.com/orcaman/concurrent-map
 ## mutex
+mutex 是sync包实现锁的基础，不能复制此package中的值。
 ## once
+
+Once是一个将执行一个动作的对象。第一次使用后不得复制一次。
+在 Go 内存模型的术语中，f 的返回“同步于”once.Do(f) 的任何调用的返回。
+
+Once 结构体如下：
+```go
+type Once struct {
+	// done indicates whether the action has been performed.
+	// It is first in the struct because it is used in the hot path.
+	// The hot path is inlined at every call site.
+	// Placing done first allows more compact instructions on some architectures (amd64/386),
+	// and fewer instructions (to calculate offset) on other architectures.
+	done uint32 // Once 的f() 是否已执行的标志
+	m    Mutex // lock
+}
+```
+
+```go
+
+func (o *Once) Do(f func()) {
+	// Note: Here is an incorrect implementation of Do:
+	//
+	//	if atomic.CompareAndSwapUint32(&o.done, 0, 1) {
+	//		f()
+	//	}
+	//
+	// Do guarantees that when it returns, f has finished.
+	// This implementation would not implement that guarantee:
+	// given two simultaneous calls, the winner of the cas would
+	// call f, and the second would return immediately, without
+	// waiting for the first's call to f to complete.
+	// This is why the slow path falls back to a mutex, and why
+	// the atomic.StoreUint32 must be delayed until after f returns.
+	// 使用atomic 包中的原子操作，保证只执行一次
+	if atomic.LoadUint32(&o.done) == 0 {
+		// Outlined slow-path to allow inlining of the fast-path.
+		o.doSlow(f)
+	}
+}
+
+func (o *Once) doSlow(f func()) {
+	o.m.Lock()
+	defer o.m.Unlock()
+	if o.done == 0 {
+		defer atomic.StoreUint32(&o.done, 1)
+		f()
+	}
+}
+
+
+```
+
 ## oncefunc
+OnceFunc 返回一个只调用 f 一次的函数。返回的函数可以并发调用。
+如果 f 发生panic，则返回的函数将在每次调用时使用相同的值发生panic。
+
 ## pool
+Pool 是可伸缩、并发安全的临时对象池，用来存放已经分配但暂时不用的临时对象，通过对象重用机制，缓解 GC 压力，提高程序性能。
+
+也就是说，它可以轻松构建高效、线程安全的空闲列表。
+
+但是，它并不适用于所有空闲列表。
+
+Pool 的一个适当用途是管理一组临时项目，这些临时项目在一个包的并发独立客户端之间静默共享并可能被重用。
+
+Pool 提供了一种方法来分摊多个客户端的分配开销。
+
+类似[ants](https://github.com/panjf2000/ants)
+
+一个比较好的例子是 fmt 包，fmt 包总是需要使用一些 []byte 之类的对象，Golang 建立了一个临时对象池，存放着这些对象，如果需要使用一个 []byte，就去 Pool 中取，如果拿不到就分配一个。这比起不停生成新的 []byte，用完了再等待 GC 回收要高效得多。
+
+store 在负载下扩展（当许多 goroutine 正在积极打印时）并在静止时缩小。
+
+/fmt/print.go
+```go
+var ppFree = sync.Pool{
+	New: func() any { return new(pp) },
+}
+```
+
+另一方面，作为短期对象的一部分维护的空闲列表不适合用于池，因为在这种情况下开销不能很好地摊销。
+
+让这些对象实现自己的空闲列表会更有效。
+
+第一次使用后不得复制池。
+
+在 Go 内存模型的术语中，对 Put(x) 的调用“先于”对返回相同值 x 的 Get 的调用“Sync”。
+
+类似地，对 New 的调用返回 x 在对 Get 的调用返回相同值 x 之前“Sync”。
+
+Pool 结构体
+```go
+
+type Pool struct {
+	noCopy noCopy // 禁止copy
+
+	local     unsafe.Pointer // local fixed-size per-P pool, actual type is [P]poolLocal 本地固定大小的每 P 池，实际类型是 [P]poolLocal
+	localSize uintptr        // size of the local array 本地数组大小
+
+	victim     unsafe.Pointer // local from previous cycle 上一个周期的local
+	victimSize uintptr        // size of victims array  上一个数组的大小
+
+	// New optionally specifies a function to generate
+	// a value when Get would otherwise return nil.
+	// It may not be changed concurrently with calls to Get.
+	New func() any
+}
+
+
+```
+
+Put
+```go
+
+// Put adds x to the pool.
+func (p *Pool) Put(x interface{}) {
+	if x == nil {
+		return
+	}
+	if race.Enabled {
+		if fastrand()%4 == 0 {
+			// Randomly drop x on floor.
+			return
+		}
+		race.ReleaseMerge(poolRaceAddr(x))
+		race.Disable()
+	}
+	l := p.pin()
+	if l.private == nil {
+		l.private = x
+		x = nil
+	}
+	runtime_procUnpin()
+	if x != nil {
+		l.Lock()
+		l.shared = append(l.shared, x)
+		l.Unlock()
+	}
+	if race.Enabled {
+		race.Enable()
+	}
+}
+
+```
+
+- 如果放入的值为空，直接return.
+- 检查当前goroutine的是否设置对象池私有值，如果没有则将x赋值给其私有成员，并将x设置为nil。
+- 如果当前goroutine私有值已经被设置，那么将该值追加到共享列表。
+
+```go
+func (p *Pool) Get() interface{} {
+	if race.Enabled {
+		race.Disable()
+	}
+	l := p.pin()
+	x := l.private
+	l.private = nil
+	runtime_procUnpin()
+	if x == nil {
+		l.Lock()
+		last := len(l.shared) - 1
+		if last >= 0 {
+			x = l.shared[last]
+			l.shared = l.shared[:last]
+		}
+		l.Unlock()
+		if x == nil {
+			x = p.getSlow()
+		}
+	}
+	if race.Enabled {
+		race.Enable()
+		if x != nil {
+			race.Acquire(poolRaceAddr(x))
+		}
+	}
+	if x == nil && p.New != nil {
+		x = p.New()
+	}
+	return x
+}
+
+```
+
+- 尝试从本地P对应的那个本地池中获取一个对象值, 并从本地池冲删除该值。
+- 如果获取失败，那么从共享池中获取, 并从共享队列中删除该值。
+- 如果获取失败，那么从其他P的共享池中偷一个过来，并删除共享池中的该值(p.getSlow())。
+- 如果仍然失败，那么直接通过New()分配一个返回值，注意这个分配的值不会被放入池中。New()返回用户注册的New函数的值，如果用户未注册New，那么返回nil。
+
+
+
 ## poolqueue
-## rwmutext
+poolDequeue 是一个无锁的固定大小的单生产者、多消费者队列。
+
+单个生产者既可以从头部推送也可以从头部弹出，消费者可以从尾部弹出。
+
+它有一个附加功能，它可以消除未使用的插槽以避免不必要的对象保留。
+
+这对于 sync.Pool 很重要，但通常不是文献中考虑的属性。
+
+## rwmutex
+RWMutex 是读写互斥锁。锁可以由任意数量的读者或单个作者持有。
+
+RWMutex 的零值是未锁定的互斥锁。
+
+第一次使用后不得复制 RWMutex。
+
+如果一个goroutine 获取了写锁 另一个goroutine 会锁住，直到写锁释放
+
+，这是为了保证锁最终可用，阻塞的锁调用会排除新的读者获取锁。
+
+RWMutex 结构体
+```go
+
+type RWMutex struct {
+	w           Mutex        // held if there are pending writers 如果有挂起的写入，则保持
+	writerSem   uint32       // semaphore for writers to wait for completing readers 用于写入者等待完成读取器的信号量
+	readerSem   uint32       // semaphore for readers to wait for completing writers 用于读取器等待完成写入器的信号量
+	readerCount atomic.Int32 // number of pending readers 挂起读取器的数量
+	readerWait  atomic.Int32 // number of departing readers 出发读取器的数量
+}
+
+```
+
+RLock
+```go
+
+func (rw *RWMutex) RLock() {
+	if race.Enabled {
+		_ = rw.w.state
+		race.Disable()
+	}
+	if rw.readerCount.Add(1) < 0 {
+		// A writer is pending, wait for it.
+		runtime_SemacquireRWMutexR(&rw.readerSem, false, 0)
+	}
+	if race.Enabled {
+		race.Enable()
+		race.Acquire(unsafe.Pointer(&rw.readerSem))
+	}
+}
+
+```
+
+```go
+
+// RUnlock undoes a single RLock call;
+// it does not affect other simultaneous readers.
+// It is a run-time error if rw is not locked for reading
+// on entry to RUnlock.
+func (rw *RWMutex) RUnlock() {
+	if race.Enabled {
+		_ = rw.w.state
+		race.ReleaseMerge(unsafe.Pointer(&rw.writerSem))
+		race.Disable()
+	}
+	if r := rw.readerCount.Add(-1); r < 0 {
+		// Outlined slow-path to allow the fast-path to be inlined
+		rw.rUnlockSlow(r)
+	}
+	if race.Enabled {
+		race.Enable()
+	}
+}
+```
+
+```go
+func (rw *RWMutex) Lock() {
+	if race.Enabled {
+		_ = rw.w.state
+		race.Disable()
+	}
+	// First, resolve competition with other writers.
+	rw.w.Lock()
+	// Announce to readers there is a pending writer.
+	r := rw.readerCount.Add(-rwmutexMaxReaders) + rwmutexMaxReaders
+	// Wait for active readers.
+	if r != 0 && rw.readerWait.Add(r) != 0 {
+		runtime_SemacquireRWMutex(&rw.writerSem, false, 0)
+	}
+	if race.Enabled {
+		race.Enable()
+		race.Acquire(unsafe.Pointer(&rw.readerSem))
+		race.Acquire(unsafe.Pointer(&rw.writerSem))
+	}
+}
+```
+
+```go
+func (rw *RWMutex) Unlock() {
+	if race.Enabled {
+		_ = rw.w.state
+		race.Release(unsafe.Pointer(&rw.readerSem))
+		race.Disable()
+	}
+
+	// Announce to readers there is no active writer.
+	r := rw.readerCount.Add(rwmutexMaxReaders)
+	if r >= rwmutexMaxReaders {
+		race.Enable()
+		fatal("sync: Unlock of unlocked RWMutex")
+	}
+	// Unblock blocked readers, if any.
+	for i := 0; i < int(r); i++ {
+		runtime_Semrelease(&rw.readerSem, false, 0)
+	}
+	// Allow other writers to proceed.
+	rw.w.Unlock()
+	if race.Enabled {
+		race.Enable()
+	}
+}
+
+```
 ## waitgroup
+
+WaitGroup 等待一组 goroutine 完成。
+
+主 goroutine 调用 Add 来设置要等待的 goroutines 的数量。
+
+然后每个 goroutines 运行并在完成时调用 Done。
+
+同时，Wait 可以用来阻塞，直到所有的 goroutines 完成。第一次使用后不得复制 WaitGroup。
+
+在 Go 内存模型的术语中，对 Done 的调用“在”它解除阻塞的任何 Wait 调用返回之前“同步”。
+
+waitGroup 结构体
+```go
+type WaitGroup struct {
+	noCopy noCopy
+
+	state atomic.Uint64 // high 32 bits are counter, low 32 bits are waiter count.
+	sema  uint32
+}
+```
+
+
+Add
+```go
+func (wg *WaitGroup) Add(delta int) {
+	if race.Enabled {
+		if delta < 0 {
+			// Synchronize decrements with Wait.
+			race.ReleaseMerge(unsafe.Pointer(wg))
+		}
+		race.Disable()
+		defer race.Enable()
+	}
+	state := wg.state.Add(uint64(delta) << 32)
+	v := int32(state >> 32)
+	w := uint32(state)
+	if race.Enabled && delta > 0 && v == int32(delta) {
+		// The first increment must be synchronized with Wait.
+		// Need to model this as a read, because there can be
+		// several concurrent wg.counter transitions from 0.
+		race.Read(unsafe.Pointer(&wg.sema))
+	}
+	if v < 0 {
+		// 传入的delta 不能为附属
+		panic("sync: negative WaitGroup counter")
+	}
+	// Add 和 Wait 不能并发调用
+	if w != 0 && delta > 0 && v == int32(delta) {
+		panic("sync: WaitGroup misuse: Add called concurrently with Wait")
+	}
+	if v > 0 || w == 0 {
+		return
+	}
+	// This goroutine has set counter to 0 when waiters > 0.
+	// Now there can't be concurrent mutations of state:
+	// - Adds must not happen concurrently with Wait,
+	// - Wait does not increment waiters if it sees counter == 0.
+	// Still do a cheap sanity check to detect WaitGroup misuse.
+	// Add 和 Wait 不能并发调用
+	if wg.state.Load() != state {
+		panic("sync: WaitGroup misuse: Add called concurrently with Wait")
+	}
+	// Reset waiters count to 0.
+	wg.state.Store(0)
+	for ; w != 0; w-- {
+		runtime_Semrelease(&wg.sema, false, 0)
+	}
+}
+```
+
+Done
+
+```go
+
+// Done decrements the WaitGroup counter by one.
+func (wg *WaitGroup) Done() {
+	// state - 1
+	wg.Add(-1)
+}
+
+```
+
+Wait
+
+```go
+func (wg *WaitGroup) Wait() {
+	if race.Enabled {
+		race.Disable()
+	}
+	// 一个死循环 
+	for {
+		state := wg.state.Load()
+		v := int32(state >> 32)
+		w := uint32(state)
+		// state 等于0 的时候return 
+		if v == 0 {
+			// Counter is 0, no need to wait.
+			if race.Enabled {
+				race.Enable()
+				race.Acquire(unsafe.Pointer(wg))
+			}
+			return
+		}
+		// Increment waiters count. 
+		if wg.state.CompareAndSwap(state, state+1) {
+			if race.Enabled && w == 0 {
+				// Wait must be synchronized with the first Add.
+				// Need to model this is as a write to race with the read in Add.
+				// As a consequence, can do the write only for the first waiter,
+				// otherwise concurrent Waits will race with each other.
+				race.Write(unsafe.Pointer(&wg.sema))
+			}
+			runtime_Semacquire(&wg.sema)
+			if wg.state.Load() != 0 {
+				panic("sync: WaitGroup is reused before previous Wait has returned")
+			}
+			if race.Enabled {
+				race.Enable()
+				race.Acquire(unsafe.Pointer(wg))
+			}
+			return
+		}
+	}
+}
+
+```
