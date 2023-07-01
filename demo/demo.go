@@ -3,12 +3,14 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"math"
 )
 
 //go:embed version.txt
 var version string
 
 func main() {
+	fmt.Println(math.MaxInt8 >> 1)
 	strings := make(chan string, 1<<45)
 	go func() {
 		for {
