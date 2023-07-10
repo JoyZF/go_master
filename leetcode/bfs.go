@@ -1,6 +1,6 @@
 package main
 
-func bfs()  {
+func bfs() {
 	// 将头节点加入队列中
 	// 申明一个已经访问过的集合数组 这样可以适用于图
 	// loop

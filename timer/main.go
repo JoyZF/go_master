@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	date = "2006-01-02"
+	date     = "2006-01-02"
 	datetime = "2006-01-02 15:04:05"
 )
 
-func main()  {
+func main() {
 	now := time.Now()
 	format := now.Format(date)
 	fmt.Println(format)

@@ -3,10 +3,10 @@ package main
 import "math"
 
 type TreeNode struct {
-	 Val int
-	 Left *TreeNode
-	 Right *TreeNode
- }
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
+}
 
 //func main()  {
 //

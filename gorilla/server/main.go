@@ -9,7 +9,6 @@ import (
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
-
 var upgrader = websocket.Upgrader{}
 
 func echo(w http.ResponseWriter, r *http.Request) {

@@ -8,7 +8,6 @@ type Aircraft interface {
 	DepartAirport()   // 飞离机场
 }
 
-
 // airliner 客机
 type airliner struct {
 	name            string          // 客机型号
@@ -23,7 +22,6 @@ func NewAirliner(name string, mediator AirportMediator) *airliner {
 	}
 }
 
-
 func (a *airliner) ApproachAirport() {
 	if !a.airportMediator.CanLandAirport(a) { // 请求塔台是否可以降落
 		fmt.Printf("机场繁忙，客机%s继续等待降落;\n", a.name)
@@ -31,8 +29,6 @@ func (a *airliner) ApproachAirport() {
 	}
 	fmt.Printf("客机%s成功滑翔降落机场;\n", a.name)
 }
-
-
 
 func (a *airliner) DepartAirport() {
 	fmt.Printf("客机%s成功滑翔起飞，离开机场;\n", a.name)

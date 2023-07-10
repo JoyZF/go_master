@@ -7,19 +7,18 @@ import (
 	"time"
 )
 
-
-func main()  {
+func main() {
 	var count = 0
 	var tempM = make(map[string]struct{})
-	for  {
+	for {
 		randKey := getRandKey()
-		if _,ok := tempM[randKey]; ok {
+		if _, ok := tempM[randKey]; ok {
 			//fmt.Println(randKey)
 			panic("exist")
 		} else {
 			tempM[randKey] = struct{}{}
 			count++
-			if count % 100000 == 0 {
+			if count%100000 == 0 {
 				fmt.Println(count)
 			}
 		}
@@ -27,14 +26,14 @@ func main()  {
 }
 
 const (
-	secret = 10101010
-	rawLen = 64
-   	letterBytes = "AB0CD1EF2GH3IJ4KL5MN6OP7QR8ST9UVWXYZ"
+	secret      = 10101010
+	rawLen      = 64
+	letterBytes = "AB0CD1EF2GH3IJ4KL5MN6OP7QR8ST9UVWXYZ"
 )
 
 var m map[int64]string
 
-func init()  {
+func init() {
 	m = make(map[int64]string)
 	for i := 0; i < 256; i++ {
 		index := i % len(letterBytes)
@@ -49,10 +48,10 @@ func getRandKey() (key string) {
 	for i := 0; i < rawLen; i++ {
 		raw = raw + getZeroOrOne()
 	}
-	for i := 0; i < rawLen; i=i+8 {
-		sub := raw[i:i+8]
+	for i := 0; i < rawLen; i = i + 8 {
+		sub := raw[i : i+8]
 		if i == 0 {
-			itoa,_ := strconv.Atoi(sub)
+			itoa, _ := strconv.Atoi(sub)
 			sub = strconv.Itoa(itoa)
 		}
 		p, _ := strconv.ParseInt(sub, 2, 64)

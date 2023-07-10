@@ -40,4 +40,3 @@ func (kl *KthLargest) Add(val int) int {
 	}
 	return kl.IntSlice[0]
 }
-

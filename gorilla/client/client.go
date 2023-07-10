@@ -12,7 +12,6 @@ import (
 
 var addr = flag.String("addr", "localhost:8080", "http service address")
 
-
 func main() {
 	flag.Parse()
 	log.SetFlags(0)
@@ -47,7 +46,7 @@ func main() {
 
 	ticker := time.NewTicker(time.Second)
 
-	for  {
+	for {
 		select {
 		case <-done:
 			return
@@ -67,8 +66,8 @@ func main() {
 			return
 		}
 		select {
-		case <- done:
-		case <- time.After(time.Second):
+		case <-done:
+		case <-time.After(time.Second):
 		}
 		return
 	}

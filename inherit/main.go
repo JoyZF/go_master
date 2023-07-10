@@ -3,11 +3,11 @@ package main
 import "fmt"
 
 type Good struct {
-	Name string
+	Name  string
 	Price int
 }
 
-func (g *Good) Sell()  {
+func (g *Good) Sell() {
 	fmt.Println("sell it")
 }
 
@@ -20,7 +20,7 @@ type Book struct {
 //	fmt.Println("sell book")
 //}
 
-func main()  {
+func main() {
 	book := Book{}
 	book.Sell()
 }

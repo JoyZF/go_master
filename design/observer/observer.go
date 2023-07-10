@@ -11,7 +11,6 @@ type Subscriber interface {
 // shortMessage 信用卡消息短信订阅者
 type shortMessage struct{}
 
-
 func (s *shortMessage) Name() string {
 	return "手机短息"
 }
@@ -30,7 +29,6 @@ func (e *email) Name() string {
 func (e *email) Update(message string) {
 	fmt.Printf("通过【%s】发送消息:%s\n", e.Name(), message)
 }
-
 
 // telephone 信用卡消息电话订阅者
 type telephone struct{}
@@ -52,15 +50,12 @@ const (
 	ExpireType                 // 逾期消息类型
 )
 
-
-
 // CreditCard 信用卡
 type CreditCard struct {
 	holder          string                   // 持卡人
 	consumeSum      float32                  // 消费总金额
 	subscriberGroup map[MsgType][]Subscriber // 根据消息类型分组订阅者
 }
-
 
 // NewCreditCard 指定持卡人创建信用卡
 func NewCreditCard(holder string) *CreditCard {
@@ -69,7 +64,6 @@ func NewCreditCard(holder string) *CreditCard {
 		subscriberGroup: make(map[MsgType][]Subscriber),
 	}
 }
-
 
 // Subscribe 支持订阅多种消息类型
 func (c *CreditCard) Subscribe(subscriber Subscriber, msgTypes ...MsgType) {

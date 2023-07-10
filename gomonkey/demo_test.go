@@ -8,7 +8,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-
 func TestApplyFuncReturn(t *testing.T) {
 	Convey("TestApplyFuncReturn", t, func() {
 

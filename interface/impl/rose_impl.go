@@ -6,7 +6,6 @@ import (
 )
 
 type Rose struct {
-
 }
 
 func New() *Rose {

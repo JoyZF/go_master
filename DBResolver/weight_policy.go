@@ -15,4 +15,3 @@ func (WeightPolicy) Resolve(connPools []gorm.ConnPool) gorm.ConnPool {
 		return connPools[rand.Intn(len(connPools))]
 	}
 }
-

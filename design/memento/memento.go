@@ -7,7 +7,6 @@ type Originator interface {
 	Save(tag string) Memento // 当前状态保存备忘录
 }
 
-
 // RolesPlayGame 支持存档的RPG游戏
 type RolesPlayGame struct {
 	name          string   // 游戏名称
@@ -29,7 +28,6 @@ func (r *RolesPlayGame) Save(tag string) Memento {
 	return newRPGArchive(tag, r.rolesState, r.scenarioState, r)
 }
 
-
 func (r *RolesPlayGame) SetRolesState(rolesState []string) {
 	r.rolesState = rolesState
 }
@@ -49,7 +47,6 @@ type Memento interface {
 	Restore()    // 根据备忘录存储数据状态恢复原对象
 }
 
-
 // rpgArchive rpg游戏存档，
 type rpgArchive struct {
 	tag           string         // 存档标签
@@ -57,7 +54,6 @@ type rpgArchive struct {
 	scenarioState string         // 存档游戏场景状态
 	rpg           *RolesPlayGame // rpg游戏引用
 }
-
 
 // newRPGArchive 根据标签，角色状态，场景状态，rpg游戏引用，创建游戏归档备忘录
 func newRPGArchive(tag string, rolesState []string, scenarioState string, rpg *RolesPlayGame) *rpgArchive {

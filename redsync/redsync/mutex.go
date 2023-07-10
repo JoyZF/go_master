@@ -239,6 +239,7 @@ var touchScript = redis.NewScript(1, `
 		return 0
 	end
 `)
+
 // touch 续约
 func (m *Mutex) touch(ctx context.Context, pool redis.Pool, value string, expiry int) (bool, error) {
 	conn, err := pool.Get(ctx)

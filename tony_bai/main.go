@@ -8,7 +8,7 @@ func (m *MyInt) PrintStr() string {
 	return fmt.Sprintf("%d", *m)
 }
 
-func main()  {
+func main() {
 	var a uint8 = 127
 	a += 1
 	fmt.Println(a)

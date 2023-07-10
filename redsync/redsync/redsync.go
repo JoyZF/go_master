@@ -28,17 +28,17 @@ func New(pools ...redis.Pool) *Redsync {
 // NewMutex returns a new distributed mutex with given name.
 func (r *Redsync) NewMutex(name string, options ...Option) *Mutex {
 	m := &Mutex{
-		name:   name, // Distributed lock name
+		name:   name,            // Distributed lock name
 		expiry: 8 * time.Second, // lock expire time，default value 8 seconds
-		tries:  32, // lock retry times, default value 32
+		tries:  32,              // lock retry times, default value 32
 		delayFunc: func(tries int) time.Duration {
 			return time.Duration(rand.Intn(maxRetryDelayMilliSec-minRetryDelayMilliSec)+minRetryDelayMilliSec) * time.Millisecond
-		},// retry function
-		genValueFunc:  genValue, // lock value generate function
-		driftFactor:   0.01, // 偏移倍数until := now.Add(m.expiry - now.Sub(start) - time.Duration(int64(float64(m.expiry)*m.driftFactor)))
-		timeoutFactor: 0.05, // timeout drift  context.WithTimeout(ctx, time.Duration(int64(float64(m.expiry)*m.timeoutFactor)))
+		}, // retry function
+		genValueFunc:  genValue,           // lock value generate function
+		driftFactor:   0.01,               // 偏移倍数until := now.Add(m.expiry - now.Sub(start) - time.Duration(int64(float64(m.expiry)*m.driftFactor)))
+		timeoutFactor: 0.05,               // timeout drift  context.WithTimeout(ctx, time.Duration(int64(float64(m.expiry)*m.timeoutFactor)))
 		quorum:        len(r.pools)/2 + 1, // 锁获取数要求值 If the client failed to acquire the lock for some reason (either it was not able to lock N/2+1 instances or the validity time is negative), it will try to unlock all the instances (even the instances it believed it was not able to lock).
-		pools:         r.pools, // redis pools
+		pools:         r.pools,            // redis pools
 	}
 	// add option
 	for _, o := range options {

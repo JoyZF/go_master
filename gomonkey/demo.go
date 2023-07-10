@@ -1,5 +1,5 @@
 package gomonkey
 
-func UserDao()  {
-	
+func UserDao() {
+
 }

@@ -15,28 +15,23 @@ func Constructor2() MyStack {
 	}
 }
 
-
-func (this *MyStack) Push(x int)  {
+func (this *MyStack) Push(x int) {
 	this.queue = append(this.queue, x)
 }
 
-
 func (this *MyStack) Pop() int {
-	val := this.queue[len(this.queue) - 1]
-	this.queue = this.queue[:len(this.queue) - 1]
+	val := this.queue[len(this.queue)-1]
+	this.queue = this.queue[:len(this.queue)-1]
 	return val
 }
-
 
 func (this *MyStack) Top() int {
 	return this.queue[len(this.queue)-1]
 }
 
-
 func (this *MyStack) Empty() bool {
 	return len(this.queue) == 0
 }
-
 
 /**
  * Your MyStack object will be instantiated and called as such:

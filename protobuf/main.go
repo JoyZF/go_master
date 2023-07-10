@@ -6,10 +6,10 @@ import (
 )
 
 // 序列化以后数据被转换成二进制类型，反序列化后直接写入对应的结构体类型。
-func main()  {
+func main() {
 	nxin := Nxin{
-		Id: *proto.Int32(1),
-		Name: *proto.String("joy"),
+		Id:       *proto.Int32(1),
+		Name:     *proto.String("joy"),
 		Telphone: *proto.String("13000000000"),
 	}
 	bytes, err := proto.Marshal(&nxin) // 序列化

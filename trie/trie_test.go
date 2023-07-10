@@ -9,7 +9,7 @@ import (
 
 var trie Trie
 
-func init()  {
+func init() {
 	content, _ := ioutil.ReadFile("badkeywords_2.txt")
 	str := string(content)
 	split := strings.Split(str, "|")
@@ -109,8 +109,6 @@ func TestTrie(t *testing.T) {
 		fmt.Println(strings)
 	}
 }
-
-
 
 func BenchmarkTrie(b *testing.B) {
 	b.ReportAllocs()

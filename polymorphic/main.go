@@ -6,10 +6,7 @@ type People interface {
 	Name() string
 }
 
-
-
 type Child struct {
-
 }
 
 func NewChild() *Child {
@@ -21,7 +18,6 @@ func (c *Child) Name() string {
 }
 
 type Audit struct {
-
 }
 
 func NewAudit() *Audit {
@@ -32,10 +28,10 @@ func (c *Audit) Name() string {
 	return "audit"
 }
 
-func main()  {
+func main() {
 	var a = 2
 	var b People
-	switch  {
+	switch {
 	case a == 1:
 		b = NewChild()
 	case a == 2:

@@ -1,7 +1,5 @@
 package main
 
-func main()  {
-	select {
-
-	}
+func main() {
+	select {}
 }
