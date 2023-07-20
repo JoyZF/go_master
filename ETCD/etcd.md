@@ -114,3 +114,65 @@ Leader 只能追加日志条目，不能删除已持久化的日志条目（只�
 - Simple Token
 - JWT Token
 - 证书认证
+
+## 租约lease
+
+什么是租约？
+
+Lease 基于主动型上报模式，**提供的一种活性检测机制**。Lease顾名思义，client和etcd server之间存在一个约定，内容是etcd server保证再约定的有效期内（TTL），不会删除你关联到此Lease上的key-value。
+
+### Lease整体架构
+
+![](https://static001.geekbang.org/resource/image/ac/7c/ac70641fa3d41c2dac31dbb551394b7c.png?wh=2464*1552)
+
+etcd 在启动的时候，创建 Lessor 模块的时候，它会启动两个常驻 goroutine，如上图所示，一个是 RevokeExpiredLease 任务，定时检查是否有过期 Lease，发起撤销过期的 Lease 操作。一个是 CheckpointScheduledLease，定时触发更新 Lease 的剩余到期时间的操作。
+
+Lessor 模块提供了 Grant、Revoke、LeaseTimeToLive、LeaseKeepAlive API 给 client 使用，各接口作用如下:
+
+- Grant 表示创建一个TTL为你指定秒数的Lease，Lessor会将Lease信息持久化存储在boltdb中。
+- Revoke表示撤销Lease并删除其关联的数据
+- LeaseTimeToLive表示获取一个Lease的有效期、剩余时间
+- LeaseKeepLive表示为Lease续期
+
+### 如何高效淘汰过期Lease
+
+如果遍历需要淘汰的Lease的话性能会很差，时间复杂度是O(N).
+
+etcd V3 采用最小堆的实现方法，每次新增Lease、续期的时候它会插入、更新一个对象到最小堆中，对象含有LeaseID和其到期时间unixnano，对象之间按到期时间升序排序。
+
+etcd Lessor 主循环每隔 500ms 执行一次撤销 Lease 检查（RevokeExpiredLease），每次轮询堆顶的元素，若已过期则加入到待淘汰列表，直到堆顶的 Lease 过期时间大于当前，则结束本轮轮询。
+
+使用堆后，插入、更新、删除，它的时间复杂度是O(Log N)，查询堆顶对象是否过期时间复杂度仅为 O(1)，性能大大提升，可支撑大规模场景下 Lease 的高效淘汰。
+
+### checkpoint机制
+
+Lease的checkpoint机制，它是为了解决Leader异常情况下TTL自动被续期，可能导致Lease永不淘汰的问题而诞生。
+
+## MVCC多版本并发控制
+
+MVCC是基于多版本技术实现的一种乐观锁机制，它乐观地认为数据不会发生冲突，但是当事务提交时，具备检测数据是否冲突的能力。
+
+在 MVCC 数据库中，你更新一个 key-value 数据的时候，它并不会直接覆盖原数据，而是新增一个版本来存储新的数据，每个数据都有一个版本号。版本号它是一个逻辑时间，为了方便你深入理解版本号意义，在下面我给你画了一个 etcd MVCC 版本号时间序列图。
+
+### treeindex 原理
+
+在etcd V3 中引入treeindex模块是为了解决V2 中直接更新内容树，导致历史版本直接被覆盖。
+
+
+
+## Watch机制
+
+在V2 中Watch机制是通过轮询实现的
+
+在V3中Watch机制的实现基于HTTP/2的gRPC协议，双向流的Watch API设计，实现了连接多路复用。
+
+etcd 基于以上介绍的 HTTP/2 协议的多路复用等机制，实现了一个 client/TCP 连接支持多 gRPC Stream， 一个 gRPC Stream 又支持多个 watcher，如下图所示。同时事件通知模式也从 client 轮询优化成 server 流式推送，极大降低了 server 端 socket、内存等资源。
+
+![](https://static001.geekbang.org/resource/image/f0/be/f08d1c50c6bc14f09b5028095ce275be.png?wh=1804*1076)
+
+
+
+
+
+
+
