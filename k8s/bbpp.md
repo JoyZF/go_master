@@ -16,3 +16,37 @@ minikube start --force --driver=docker
 ```shell
 kubectl proxy --port=80 --address=0.0.0.0 --accept-hosts=^.*
 ```
+
+#### kubectl port-forward service/hello-minikube 7080:8080  
+通过端口转发映射本地端口到指定的应用端口，从而访问集群中的应用程序(Pod).
+但是通过这种方式，只能访问到本地的端口。
+如果要让外网也能访问到的话，需要带上--address 0.0.0.0 或者指定访问IP。
+```shell
+kubectl port-forward --address 0.0.0.0 service/hello-minikube 7080:8080
+```
+
+#### kubectl 后台运行
+用nohup后台运行时会报 nohup: 无法运行命令"kubectl": 没有那个文件或目录
+那就另辟蹊径，使用screen命令：screen命令可以创建一个虚拟终端窗口，并在其中运行kubectl命令。这样可以随时在后台访问和管理kubectl会话，而不受SSH会话的限制。
+
+```shell
+sudo yum install screen
+
+screen -S kubectl_session
+
+kubectl [command]
+
+```
+
+按下Ctrl + A，然后按下D，将screen会话切换到后台。
+
+要重新连接到已经在后台运行的screen会话，可以执行以下命令.
+```shell
+screen -r kubectl_session
+
+```
+
+
+### 启动一个Nginx Pod 
+### build 一个docker image
+
