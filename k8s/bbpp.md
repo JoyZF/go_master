@@ -49,4 +49,14 @@ screen -r kubectl_session
 
 ### 启动一个Nginx Pod 
 ### build 一个docker image
-
+```shell
+// 以nginx为例
+1、 docker pull nginx 
+2、docker images 查看是否pull成功
+3、对改nginx做一些改动
+4、docker tag yourdomain/nginx:latest
+5、docker push yourdomain/nginx:latest
+6、curl https://yourdomain/v2/_catalog
+返回：{"repositories":["myubuntu","nginx"]} 即上传成功
+7、docker pull yourdomain/nginx:latest 如果pull即成功
+```
