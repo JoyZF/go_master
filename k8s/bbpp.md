@@ -60,3 +60,5 @@ screen -r kubectl_session
 返回：{"repositories":["myubuntu","nginx"]} 即上传成功
 7、docker pull yourdomain/nginx:latest 如果pull即成功
 ```
+
+[Docker registry](https://docs.docker.com/registry/)
