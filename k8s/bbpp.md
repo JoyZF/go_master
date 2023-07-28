@@ -62,3 +62,12 @@ screen -r kubectl_session
 ```
 
 [Docker registry](https://docs.docker.com/registry/)
+
+
+
+
+
+### docker 命令记录
+
+
+
