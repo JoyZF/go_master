@@ -70,4 +70,21 @@ screen -r kubectl_session
 ### docker 命令记录
 
 
+### bbpp.online 部署到k8s环境
+- 把hugo的public目录打包进nginx docker image
+- create nginx pod
+- create nginx service
+- create ingress
+
+#### 遇到的问题
+- pod.yaml的image直接写docker registry 的镜像地址，报ErrPullImage.
+修改minikube启动命令  指定registry.
+minikube start --memory 2048mb --cpus 2 \
+  --cache-images=true \
+  --driver=docker \
+  --image-mirror-country=cn \
+  --insecure-registry='127.0.0.1:5000' \
+  --registry-mirror="https://registry.docker-cn.com,https://docker.mirrors.ustc.edu.cn" \
+  --service-cluster-ip-range='10.10.0.0/24'
+
 
