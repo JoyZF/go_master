@@ -1,4 +1,4 @@
-# K8S 实战
+# 将博客使用minikube部署遇到的一些问题
 需求：将bbpp.onilne 使用k8s 部署。
 ## 需求拆分
 ### 运行环境
@@ -81,14 +81,26 @@ screen -r kubectl_session
 - 宿主机的nginx 转发到ingress
 
 #### 遇到的问题
-- pod.yaml的image直接写docker registry 的镜像地址，报ErrPullImage.
+##### pod.yaml的image直接写docker registry 的镜像地址，报ErrPullImage.
 修改minikube启动命令  指定registry.
 minikube start --memory 2048mb --cpus 2 \
   --cache-images=true \
   --driver=docker \
   --image-mirror-country=cn \
-  --insecure-registry='127.0.0.1:5000' \
+  --insecure-registry='docker.bbpp.online' \
   --registry-mirror="https://registry.docker-cn.com,https://docker.mirrors.ustc.edu.cn" \
   --service-cluster-ip-range='10.10.0.0/24'
 
+[Pod 一直处于 ImagePullBackOff 状态](https://cloud.tencent.com/document/product/457/42947)
 
+##### pod 一直 CrashLoopBackOff
+经排查，这次CrashLoopBackOff 是因为yaml中声明了一个exec： /bin/echo 实际上容器中是没有echo 命令的，所以一直报错，去掉多余的声明即可。
+
+其他CrashLoopBackOff排查思路：
+- 系统发生OOM 以看到 Pod 中容器退出状态码是 137，表示被 SIGKILL 信号杀死，同时内核会报错: Out of memory: Kill process ...。大概率是节点上部署了其它非 K8S 管理的进程消耗了比较多的内存，或者 kubelet 的 --kube-reserved 和 --system-reserved 配的比较小，没有预留足够的空间给其它非容器进程，节点上所有 Pod 的实际内存占用总量不会超过 /sys/fs/cgroup/memory/kubepods 这里 cgroup 的限制，这个限制等于 capacity - "kube-reserved" - "system-reserved"，如果预留空间设置合理，节点上其它非容器进程（kubelet, dockerd, kube-proxy, sshd 等) 内存占用没有超过 kubelet 配置的预留空间是不会发生系统 OOM 的，可以根据实际需求做合理的调整。
+- cgroup OOM 如果是 cgrou OOM 杀掉的进程，从 Pod 事件的下 Reason 可以看到是 OOMKilled，说明容器实际占用的内存超过 limit 了，同时内核日志会报: ``。 可以根据需求调整下 limit。
+- 节点内存碎片化 如果节点上内存碎片化严重，缺少大页内存，会导致即使总的剩余内存较多，但还是会申请内存失败，参考 处理实践: 内存碎片化
+详细内容可参考腾讯云的这篇文章：[Pod 处于 CrashLoopBackOff 状态](https://cloud.tencent.com/document/product/457/43130)
+
+### Ingress Controller , Ingress Class ,Ingress , Service , Pod 的相互联系
+![](https://static001.geekbang.org/resource/image/bb/14/bb7a911e10c103fb839e01438e184914.jpg?wh=1920x736)
