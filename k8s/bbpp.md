@@ -104,3 +104,6 @@ minikube start --memory 2048mb --cpus 2 \
 
 ### Ingress Controller , Ingress Class ,Ingress , Service , Pod 的相互联系
 ![](https://static001.geekbang.org/resource/image/bb/14/bb7a911e10c103fb839e01438e184914.jpg?wh=1920x736)
+
+## k8s版bbpp.online 
+https://k8s.bbpp.online
