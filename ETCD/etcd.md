@@ -171,8 +171,26 @@ etcd 基于以上介绍的 HTTP/2 协议的多路复用等机制，实现了一�
 ![](https://static001.geekbang.org/resource/image/f0/be/f08d1c50c6bc14f09b5028095ce275be.png?wh=1804*1076)
 
 
+## 事务
+
+ETCD的事务跟MySQL的innodb类似，也是通过MVCC版本号控制。
+
+### 事务特性
+在V2的时候，etcd提供了CAS，但是只支持单key，不支持多key，因此严格来说称不上事务。
+
+etcd V3提供了全新的迷你事务API，同时基于MVCC版本号，可以实现各种隔离级别的事务。
+```shell
+client.Txn(ctx).If(cmp1, cmp2, ...).Then(op1, op2, ...,).Else(op1, op2, …)
+```
+从上面结构中你可以看到，事务 API 由 If 语句、Then 语句、Else 语句组成，这与我们平时常见的 MySQL 事务完全不一样。
 
 
+### 整体流程
+![](https://static001.geekbang.org/resource/image/e4/d3/e41a4f83bda29599efcf06f6012b0bd3.png?wh=1920*852)
+
+## boltdb
+### boltdb 磁盘布局
+![](https://static001.geekbang.org/resource/image/a6/41/a6086a069a2cf52b38d60716780f2e41.png?wh=1920*1131)
 
 
 
