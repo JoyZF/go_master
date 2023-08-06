@@ -106,7 +106,7 @@ Leader 只能追加日志条目，不能删除已持久化的日志条目（只�
 
 [Raft 算法动画演示，快速理解Raft分布式共识算法](http://kailing.pub/raft/index.html)
 
-## 鉴权
+## 鉴权cd 
 
 ![](https://static001.geekbang.org/resource/image/30/4e/304257ac790aeda91616bfe42800364e.png?wh=1920*420)
 
