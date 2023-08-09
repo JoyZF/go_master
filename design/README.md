@@ -14,11 +14,10 @@
 - [策略模式](./strategy/strategy.md)
 - [模板方法模式](./template/template.md)
 - [访问者模式](./visitor/visitor.md)
-- 桥接模式
-- 组合模式
-- 装饰模式
-- 外观模式
-- 享元模式
-- 代理模式
-- 工厂方法模式
-- 
+- [桥接模式](./bridge/bridging.md)
+- [组合模式](./combination/combination.md)
+- [装饰模式](./decoration/decoration.md)
+- [门面模式](./facade/facade.md)
+- [享元模式](./flyweight/flyweight.md)
+- [代理模式](./agent/agent.md)
+- [工厂方法模式](./factory/factory.md)
