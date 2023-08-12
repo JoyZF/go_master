@@ -193,4 +193,16 @@ client.Txn(ctx).If(cmp1, cmp2, ...).Then(op1, op2, ...,).Else(op1, op2, …)
 ![](https://static001.geekbang.org/resource/image/a6/41/a6086a069a2cf52b38d60716780f2e41.png?wh=1920*1131)
 
 
+### ETCD链路分析图
+![](https://static001.geekbang.org/resource/image/7f/52/7f8c66ded3e151123b18768b880a2152.png?wh=1920*1253)
 
+
+
+# 阅读etcd源码建议
+建议可以先从早期的v2代码看起，那时逻辑最简单，https://github.com/etcd-io/etcd/blob/release-0.4/server/v2/get_handler.go,然后再看etcd v3的代码，在这个过程中，我给你几个小建议：
+1. 抓住主次，比如核心读写流程是怎样的，忽略一些特殊细节
+2. 看看测试用例如何使用核心模块的API的，比如etcd v3 mvcc的模块测试文件
+   https://github.com/etcd-io/etcd/blob/v3.4.9/mvcc/kv_test.go
+3. 自己可动手写写源码分析
+4. 自己多实践下，部署个单机etcd集群，至少要把etcdctl各个命令给操作下
+5. 日志级别可以改成debug, 更加方便观察
