@@ -196,6 +196,9 @@ client.Txn(ctx).If(cmp1, cmp2, ...).Then(op1, op2, ...,).Else(op1, op2, …)
 ### ETCD链路分析图
 ![](https://static001.geekbang.org/resource/image/7f/52/7f8c66ded3e151123b18768b880a2152.png?wh=1920*1253)
 
+### ETCD 运维
+![](https://static001.geekbang.org/resource/image/80/c2/803b20362b21d13396ee099f413968c2.png?wh=1920*1409)
+
 
 
 # 阅读etcd源码建议
