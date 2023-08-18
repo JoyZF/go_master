@@ -16,6 +16,7 @@
 - [x] Local Cache
 - [ ] json
 - [x] Redis
+- [x] redis lock
 - [ ] SingleFlight
 - [x] JWT
 - [x] Leaf
@@ -39,6 +40,10 @@
 - [ ] template
 - [x] Functional options
 - [x] linux
+- [x] ETCD
+- [x] design
+- [x] NSQ
+- [x] seata
 
 ##### 平时的一些收集
 
