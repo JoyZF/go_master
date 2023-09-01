@@ -50,17 +50,6 @@ OSI全称Open System Interconnection，OSI 模型是一个描述网络功能的�
 ![](https://chinese.freecodecamp.org/news/content/images/2021/11/2-Network-Topology-Types.png)
 
 
-
-
-
-
-
-
-
-
-
-
-
 网络由节点、节点之间的链路和管理节点间数据传输的协议组成。
 
 无论网络的规模和复杂度如何，你都可以通过学习 OSI 模型和七层网络来理解所有在计算机网络中发生的事情。
