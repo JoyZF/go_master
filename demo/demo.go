@@ -9,6 +9,18 @@ import (
 //go:embed version.txt
 var version string
 
+const (
+	C_1 = "C1"
+	C_2 = "C2"
+	C_3 = "C3"
+	C_4 = "C4"
+	C_5 = "C5"
+)
+
+var (
+	CARRAY = []string{C_1, C_2, C_3, C_4, C_5}
+)
+
 func main() {
 	fmt.Println(math.MaxInt8 >> 1)
 	strings := make(chan string, 1<<45)
