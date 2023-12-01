@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSE Demo</title>
+    <style>
+        #event-log {
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+<h1>SSE Demo</h1>
+
+<div id="event-log"></div>
+
+<script>
+    const eventLog = document.getElementById('event-log');
+
+    const source = new EventSource('http://localhost:8080/');
+
+    source.onmessage = function(event) {
+        const message = document.createElement('p');
+        message.textContent = event.data;
+        eventLog.appendChild(message);
+    };
+</script>
+</body>
+</html>
