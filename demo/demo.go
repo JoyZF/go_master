@@ -22,6 +22,14 @@ var (
 )
 
 func main() {
+	m := make(map[string]interface{})
+	m2 := make(map[string]interface{})
+	fmt.Println(m == m2)
+
+	m3 := new(map[string]interface{})
+	m4 := new(map[string]interface{})
+	fmt.Println(m3 == m4)
+
 	f, _ := strconv.ParseFloat("5.4", 64)
 	fmt.Println(fmt.Sprintf("%.30f", f))
 	result := 20.4 * 100
