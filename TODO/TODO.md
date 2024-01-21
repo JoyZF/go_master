@@ -122,3 +122,6 @@ type hchan struct {
 # 逃逸分析
 # GMP
 # GC
+
+https://time.geekbang.org/column/article/388920
+https://seisman.github.io/how-to-write-makefile/
