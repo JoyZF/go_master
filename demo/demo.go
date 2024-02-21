@@ -22,9 +22,9 @@ var (
 )
 
 func main() {
-	m := make(map[string]interface{})
-	m2 := make(map[string]interface{})
-	fmt.Println(m == m2)
+	//m := make(map[string]string)
+	//m2 := make(map[string]string)
+	//fmt.Println(m == m2)
 
 	m3 := new(map[string]interface{})
 	m4 := new(map[string]interface{})
