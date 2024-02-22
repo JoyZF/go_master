@@ -104,3 +104,4 @@ func HasSuffix(s, suffix []byte) bool {
 #### hash分表因子为什么是2的n次方？
 这个是hash函数实现的一个技巧，当计算hash值的时候，普通做法是取余操作，例如h%len，但如果len是2的N次方，通过位操作性能更高，
 计算方式为h & (len-1)
+
