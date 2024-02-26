@@ -372,3 +372,11 @@ t is now {77 Sunset Strip}
 - 反射从接口值到反射对象
 - 反射从反射对象到接口值
 - 要修改反射对象，该值必须是可设置的
+
+
+
+## reference
+
+[The Laws of Reflection](https://go.dev/blog/laws-of-reflection)
+
+[本文example]()
