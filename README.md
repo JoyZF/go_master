@@ -2,22 +2,22 @@
 
 ## 目录
 - [x] error 
-- [ ] concurrency
+- [x] concurrency
 - [x] runtime
-- [ ] testing
-- [ ] 微服务概览与治理
-- [ ] 工程化实践
-- [ ] 分布式缓存/分布式事务
+- [x] testing
+- [x] 微服务概览与治理
+- [x] 工程化实践
+- [x] 分布式缓存/分布式事务
 - [x] 网络编程
-- [ ] 日志&指标&链路追踪
-- [ ] DNS&CDN
+- [x] 日志&指标&链路追踪
+- [x] DNS&CDN
 - [x] kafka
 - [x] MySQL
 - [x] Local Cache
-- [ ] json
+- [x] json
 - [x] Redis
 - [x] redis lock
-- [ ] SingleFlight
+- [x] SingleFlight
 - [x] JWT
 - [x] Leaf
 - [x] Kit
@@ -34,17 +34,15 @@
 - [x] rand string
 - [x] BFE
 - [x] decoration
-- [ ] MQ
+- [x] MQ
 - [x] Redis distributed locks
 - [x] AST
-- [ ] template
 - [x] Functional options
 - [x] linux
 - [x] ETCD
 - [x] design
 - [x] NSQ
 - [x] seata
-- 
 
 ##### 平时的一些收集
 
